@@ -5,14 +5,14 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from Infernux.engine.build.contracts import (
+from infernux.engine.build.contracts import (
     BuildOption,
     BuildOptionChoice,
     BuildOptionKind,
     BuildTarget,
     PlatformExporter,
 )
-from Infernux.engine.build.host_player_export import (
+from infernux.engine.build.host_player_export import (
     HOST_PLAYER_CAPABILITIES,
     create_host_player_plan,
     execute_host_player_build,
