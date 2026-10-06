@@ -17,6 +17,8 @@ class ReleaseTests(unittest.TestCase):
         self.root = Path(self.workspace.name) / "repository"
         source = Path(__file__).resolve().parents[1]
         shutil.copytree(source / "package", self.root / "package", ignore=shutil.ignore_patterns("player"))
+        self.metadata = json.loads((self.root / "package/inx_package.json").read_text(encoding="utf-8"))
+        self.tag = f"v{self.metadata['version']}"
         self.payload = self.root / "package/editor/infernux_windows/player"
         self.payload.mkdir()
         (self.payload / "Player.inxmanifest").write_text(json.dumps({
@@ -34,7 +36,7 @@ class ReleaseTests(unittest.TestCase):
     def test_release_rejects_exporter_only_package(self):
         (self.payload / "Runtime.inxrt").unlink()
         with self.assertRaises(FileNotFoundError):
-            release.build_release("v0.2.1")
+            release.build_release(self.tag)
         self.assertFalse((self.root / "dist").exists())
 
     def test_release_rejects_wrong_engine_payload(self):
@@ -43,7 +45,7 @@ class ReleaseTests(unittest.TestCase):
         document["engine_version"] = "0.3.7"
         manifest.write_text(json.dumps(document), encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "engine/ABI"):
-            release.build_release("v0.2.1")
+            release.build_release(self.tag)
 
     def test_cmake_entry_produces_only_the_final_inxpackage_and_manifest(self):
         artifact, manifest = release.build_release()
@@ -53,9 +55,9 @@ class ReleaseTests(unittest.TestCase):
 
     def test_package_and_manifest(self):
         root = Path(__file__).resolve().parents[1]
-        source = json.loads((root / "package/inx_package.json").read_text(encoding="utf-8"))
+        source = self.metadata
         with tempfile.TemporaryDirectory() as temporary:
-            artifact, manifest = release.build_release(f"v{source['version']}", Path(temporary))
+            artifact, manifest = release.build_release(self.tag, Path(temporary))
             document = json.loads(manifest.read_text(encoding="utf-8"))
             self.assertEqual(document["artifact"]["name"], artifact.name)
             self.assertEqual(document["reference"], source["reference"])
