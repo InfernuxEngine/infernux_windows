@@ -2,7 +2,7 @@
 
 The official Windows build plugin for [Infernux](https://github.com/ChenlizheMe/Infernux), an open-source game engine with a C++17/Vulkan core and Python authoring layer. Install this plugin to export an Infernux project as a native Windows x64 game without compiling the engine yourself.
 
-[简体中文](README.zh-CN.md) · [Infernux Engine](https://github.com/ChenlizheMe/Infernux) · [Plugin Template](https://github.com/ChenlizheMe/infernux_plugin_template) · [Releases](https://github.com/ChenlizheMe/infernux_windows/releases)
+[简体中文](README.zh-CN.md) · [Infernux Engine](https://github.com/ChenlizheMe/Infernux) · [Plugin Template](https://github.com/InfernuxEngine/infernux_plugin_template) · [Releases](https://github.com/InfernuxEngine/infernux_windows/releases)
 
 ![Infernux Windows export workflow](package/plugin_pages/media/overview.png)
 

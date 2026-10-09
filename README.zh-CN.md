@@ -2,7 +2,7 @@
 
 这是 [Infernux](https://github.com/ChenlizheMe/Infernux) 游戏引擎的官方 Windows 构建插件。安装后，编辑器就能把项目导出为原生 Windows x64 游戏；Player 和 Python 运行时已经随插件准备好，普通用户不需要下载引擎源码，也不需要自己运行 CMake。
 
-[English](README.md) · [Infernux 引擎](https://github.com/ChenlizheMe/Infernux) · [插件模板](https://github.com/ChenlizheMe/infernux_plugin_template) · [发布制品](https://github.com/ChenlizheMe/infernux_windows/releases)
+[English](README.md) · [Infernux 引擎](https://github.com/ChenlizheMe/Infernux) · [插件模板](https://github.com/InfernuxEngine/infernux_plugin_template) · [发布制品](https://github.com/InfernuxEngine/infernux_windows/releases)
 
 ![Infernux Windows 导出流程](package/plugin_pages/media/overview.png)
 
