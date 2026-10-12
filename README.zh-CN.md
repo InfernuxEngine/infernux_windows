@@ -15,7 +15,7 @@
 
 | 包标识 | 版本 | 适配引擎 | 构建环境 | 目标平台 |
 | --- | --- | --- | --- | --- |
-| `infernux/platform-windows` | 0.2.1 | Infernux 0.4.1 | Windows x64 | Windows x64 |
+| `infernux/platform-windows` | 0.2.1 | Infernux 0.4.2 | Windows x64 | Windows x64 |
 
 ## 安装与导出
 

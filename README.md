@@ -15,7 +15,7 @@ The official Windows build plugin for [Infernux](https://github.com/ChenlizheMe/
 
 | Package | Version | Compatible engine | Build host | Target |
 | --- | --- | --- | --- | --- |
-| `infernux/platform-windows` | 0.2.1 | Infernux 0.4.1 | Windows x64 | Windows x64 |
+| `infernux/platform-windows` | 0.2.1 | Infernux 0.4.2 | Windows x64 | Windows x64 |
 
 ## Install and use
 
