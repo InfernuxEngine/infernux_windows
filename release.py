@@ -8,17 +8,14 @@ from pathlib import Path
 
 import package
 
-RUNTIME_ENGINE_VERSION = "0.4.2"
-
-
-def player_payload() -> tuple[Path, tuple[str, ...]]:
+def player_payload(engine_version: str) -> tuple[Path, tuple[str, ...]]:
     """Require the complete CMake-built payload before publishing a release."""
     root = Path(__file__).resolve().parent
     platform = json.loads((root / "package/inx_package.json").read_text(encoding="utf-8"))["reference"].rsplit("-", 1)[1]
     payload = root / "package/editor" / f"infernux_{platform}" / "player"
     document = json.loads((payload / "Player.inxmanifest").read_text(encoding="utf-8"))
     expected = {
-        "engine_version": RUNTIME_ENGINE_VERSION,
+        "engine_version": engine_version,
         "python_abi": "cp313",
         "platform": "win32" if platform == "windows" else "linux",
         "distribution": "platform-plugin",
@@ -44,7 +41,7 @@ def build_release(tag: str | None = None, output: Path | None = None) -> tuple[P
         tag = expected
     if tag != expected:
         raise ValueError(f"Release tag must match package version: {expected}")
-    player_payload()
+    player_payload(metadata["engine"].removeprefix(">="))
     destination = output if output is not None else root / "dist"
     destination.mkdir(parents=True, exist_ok=True)
     stem = metadata["reference"].replace("/", ".")

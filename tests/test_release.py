@@ -22,7 +22,7 @@ class ReleaseTests(unittest.TestCase):
         self.payload = self.root / "package/editor/infernux_windows/player"
         self.payload.mkdir()
         (self.payload / "Player.inxmanifest").write_text(json.dumps({
-            "engine_version": release.RUNTIME_ENGINE_VERSION, "python_abi": "cp313",
+            "engine_version": self.metadata["engine"].removeprefix(">="), "python_abi": "cp313",
             "platform": "win32", "machine": "x86_64", "distribution": "platform-plugin",
         }), encoding="utf-8")
         for name in ("Runtime.inxrt", "Parallel.inxmod"):
