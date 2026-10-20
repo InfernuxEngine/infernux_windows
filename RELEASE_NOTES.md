@@ -1,3 +1,8 @@
+# 0.2.10 — Infernux 0.4.3
+
+- Rebuild the complete Player payload against the final 0.4.3 engine source, including asset import-failure publication.
+- Keep the engine requirement >=0.4.3.
+
 # 0.2.9 — Infernux 0.4.3
 
 - Generate Windows Player executable file/product versions from the engine version.
