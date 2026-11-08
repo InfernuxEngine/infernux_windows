@@ -1,128 +1,22 @@
-name: Package and release
+# Platform binaries are published together by the owning engine release workflow:
+# ChenlizheMe/Infernux/.github/workflows/engine-platform-plugins.yml
+name: Platform Plugin Source Checks
 
 on:
   push:
-    branches: [main]
-    tags: ['v*']
   pull_request:
   workflow_dispatch:
-    inputs:
-      release_tag:
-        description: Existing tag to publish (empty builds only)
-        required: false
-        type: string
-        default: ''
-      payload_run_id:
-        description: Reuse the complete-platform-plugin artifact from this run instead of rebuilding
-        required: false
-        type: string
-        default: ''
 
 permissions:
   contents: read
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Test standalone packaging
-        run: python -m unittest discover -s tests -v
-
-  release:
-    needs: test
-    if: (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch') && inputs.payload_run_id == ''
-    runs-on: windows-2022
-    timeout-minutes: 120
-    permissions:
-      contents: write
-    defaults:
-      run:
-        shell: bash -el {0}
-        working-directory: engine
-    steps:
-      - name: Check out the matching engine release line
-        uses: actions/checkout@v4
-        with:
-          repository: ChenlizheMe/Infernux
-          ref: e57387c0b65fa0b4838341faafa0572d100e8411
-          submodules: recursive
-          path: engine
-      - name: Build this exact plugin revision in its owning subrepository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          path: engine/external/plugins/infernux_windows
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: infernux
-          python-version: '3.13'
-          auto-activate-base: false
-      - name: Install Vulkan SDK
-        shell: pwsh
-        run: |
-          conda activate infernux
-          $version = '1.3.296.0'
-          $installer = Join-Path $env:RUNNER_TEMP 'vulkan-sdk.exe'
-          Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/$version/windows/VulkanSDK-$version-Installer.exe" -OutFile $installer
-          Start-Process -Wait -WindowStyle Hidden -FilePath $installer -ArgumentList '--accept-licenses','--default-answer','--confirm-command','install'
-          "VULKAN_SDK=C:\VulkanSDK\$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Install Vulkan Runtime
-        timeout-minutes: 5
-        shell: pwsh
-        run: |
-          conda activate infernux
-          $version = '1.3.296.0'
-          $runtimeInstaller = Join-Path $env:RUNNER_TEMP 'vulkan-runtime.exe'
-          Invoke-WebRequest "https://sdk.lunarg.com/sdk/download/$version/windows/VulkanRT-$version-Installer.exe" -OutFile $runtimeInstaller
-          $runtimeProcess = Start-Process -Wait -PassThru -WindowStyle Hidden -FilePath $runtimeInstaller -ArgumentList '/auto'
-          if ($runtimeProcess.ExitCode -ne 0) { throw "Vulkan Runtime installation failed: $($runtimeProcess.ExitCode)" }
-      - name: Install release-engineering Python dependencies
-        run: |
-          conda activate infernux
-          python -m pip install --disable-pip-version-check -r requirements.txt
-      - name: Build the complete plugin directly with CMake
-        run: |
-          conda activate infernux
-          cmake --preset windows-msvc-release
-          cmake --build --preset windows-msvc-player
-      - uses: actions/upload-artifact@v4
-        with:
-          name: complete-platform-plugin
-          path: |
-            engine/external/plugins/infernux_windows/dist/infernux.platform-windows.inxpkg
-            engine/external/plugins/infernux_windows/dist/infernux.platform-windows.release.json
-          if-no-files-found: error
-  publish:
-    needs: [test, release]
-    if: always() && needs.test.result == 'success' && (needs.release.result == 'success' || inputs.payload_run_id != '') && (github.ref_type == 'tag' || inputs.release_tag != '')
-    runs-on: ubuntu-22.04
-    permissions:
-      actions: read
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.release_tag || github.ref }}
-      - uses: actions/download-artifact@v4
-        with:
-          run-id: ${{ inputs.payload_run_id || github.run_id }}
-          github-token: ${{ github.token }}
-          name: complete-platform-plugin
-          path: dist
-      - name: Publish versioned plugin
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
-        run: |
-          python -c 'import json,os; m=json.load(open("dist/infernux.platform-windows.release.json")); assert m["release_tag"] == os.environ["RELEASE_TAG"], "Release tag must match package version"'
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" dist/infernux.platform-windows.inxpkg dist/infernux.platform-windows.release.json --clobber
-          else
-            gh release create "$RELEASE_TAG" dist/infernux.platform-windows.inxpkg dist/infernux.platform-windows.release.json \
-              --verify-tag --title "$RELEASE_TAG" --notes-file RELEASE_NOTES.md
-          fi
+      - name: Test standalone package construction
+        run: python -m unittest discover -s tests -p test_release.py -v

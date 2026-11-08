@@ -1,48 +1,25 @@
 # Infernux Windows 平台插件
 
-这是 [Infernux](https://github.com/ChenlizheMe/Infernux) 游戏引擎的官方 Windows 构建插件。安装后，编辑器就能把项目导出为原生 Windows x64 游戏；Player 和 Python 运行时已经随插件准备好，普通用户不需要下载引擎源码，也不需要自己运行 CMake。
+[English](README.md) · [引擎版本制品](https://github.com/ChenlizheMe/Infernux/releases)
 
-[English](README.md) · [Infernux 引擎](https://github.com/ChenlizheMe/Infernux) · [插件模板](https://github.com/InfernuxEngine/infernux_plugin_template) · [发布制品](https://github.com/InfernuxEngine/infernux_windows/releases)
+为 Infernux 提供 `windows-x64` 构建目标。构建宿主与目标：Windows x64。
 
-![Infernux Windows 导出流程](package/plugin_pages/media/overview.png)
+![Infernux Windows 构建流程](package/plugin_pages/media/overview.png)
 
-## 插件提供什么
+## 安装与使用
 
-- 编辑器中的 `windows-x64` 构建目标
-- 预编译的原生 Player、CPython 3.13 运行时和并行模块
-- Vulkan 渲染与 Windows 导出流程
-- 二进制游戏内容包，不直接暴露可编辑的 `Assets`、`Library` 目录
+通过引擎的官方插件目录安装。平台插件随引擎版本统一构建，必须匹配引擎热修号、Python ABI 和目标平台。例如引擎 `0.4.3-v8` 对应平台安装包 `0.4.3.post8`；本仓库的源码包元数据会在最终打包时替换为自动生成的版本标识。
 
-| 包标识 | 版本 | 适配引擎 | 构建环境 | 目标平台 |
-| --- | --- | --- | --- | --- |
-| `infernux/platform-windows` | 0.2.21 | Infernux >=0.4.3; payload 0.4.3-v8; Python 3.13 | Windows x64 | Windows x64 |
+下载服务按 `platform-plugins/<engine_release>/` 保存制品，GitHub 备用下载来自同一个引擎 Release。四个平台子仓库不再各自独立发布二进制。
 
-## 安装与导出
+版本匹配时直接使用预编译 Player。已安装插件的载荷不匹配时，引擎构建器尝试从当前引擎版本的源码重新编译，验证后覆盖该插件的 Player 载荷，后续直接复用。重建需要相应工具链，不会替换引擎 SDK。
 
-在 Infernux 中打开**插件**窗口，从官方列表选择 **Infernux Windows Platform**，导入并启用即可。官方安装会优先使用 Infernux 分发服务；该渠道不可用时，编辑器会改用 GitHub Releases。也可以从本仓库的 Releases 页面下载 `infernux.platform-windows.inxpkg` 手动导入。
+## 维护
 
-随后在构建设置中选择 `windows-x64` 并导出。生成目录包含游戏程序、运行库和打包后的项目内容，发布时请保持整个目录完整。该插件只负责 Windows 原生构建，不提供从 Linux 交叉构建 Windows 的能力。
+在引擎仓库使用 `scripts/release/build_platform_plugins.py` 构建或打包此平台。引擎 CI 使用同一源码提交生成四个平台插件，统一核对版本与摘要，全部成功后才能发布引擎。平台仓库自身的 CI 负责源码与打包检查。`package.py`、`release.py` 保留为独立开发检查工具。
 
-## 仓库说明
-
-真正进入插件包的内容都在 `package/` 中。根目录的打包脚本、测试、CI、文档源文件和原生构建配置只服务于开发与发布，不会进入 `.inxpkg`。
-
-```text
-package/
-  inx_package.json
-  editor/infernux_windows/
-  plugin_pages/
-```
-
-维护者通过引擎的 `windows-msvc-player` preset 直接把 Player 产出到本仓库。已有载荷可用下面的命令校验和生成发布文件：
-
-```powershell
-python package.py dist/infernux.platform-windows.inxpkg
-python release.py v0.2.1
-```
-
-推送与插件版本一致的 `v<version>` 标签后，GitHub Actions 会自动发布 `.inxpkg` 和对应的 release manifest。
+安装包只包含 `package/` 和编译后的平台载荷。测试、CMake、CI、构建工具和缓存不会进入安装包。具体环境变量与批处理命令见引擎的[平台 Player 发布说明](https://github.com/ChenlizheMe/Infernux/blob/main/docs/learn/platform-player-releases.md)。
 
 ## 许可证
 
-[MIT](LICENSE)。随包提供的第三方组件继续遵守各自的许可证。
+[MIT](LICENSE)。捆绑依赖保留各自的许可证。

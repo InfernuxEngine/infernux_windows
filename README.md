@@ -1,50 +1,25 @@
 # Infernux Windows Platform
 
-The official Windows build plugin for [Infernux](https://github.com/ChenlizheMe/Infernux), an open-source game engine with a C++17/Vulkan core and Python authoring layer. Install this plugin to export an Infernux project as a native Windows x64 game without compiling the engine yourself.
+[简体中文](README.zh-CN.md) · [Engine releases](https://github.com/ChenlizheMe/Infernux/releases)
 
-[简体中文](README.zh-CN.md) · [Infernux Engine](https://github.com/ChenlizheMe/Infernux) · [Plugin Template](https://github.com/InfernuxEngine/infernux_plugin_template) · [Releases](https://github.com/InfernuxEngine/infernux_windows/releases)
+The official `windows-x64` Player exporter for Infernux. Build hosts and targets: Windows x64.
 
 ![Infernux Windows export workflow](package/plugin_pages/media/overview.png)
 
-## What this plugin provides
+## Install
 
-- The `windows-x64` build target in the Infernux Editor
-- A precompiled native Player, CPython 3.13 runtime, and parallel module
-- Vulkan rendering and the Windows export pipeline
-- Binary game-content packaging instead of an editable `Assets`/`Library` tree
+Install this platform from the engine's official plugin catalog. Platform packages are built and published with the engine release, using its exact hotfix, Python ABI and target. For example, engine `0.4.3-v8` owns platform package version `0.4.3.post8`. The source metadata in this repository is replaced by that generated identity during final packaging.
 
-| Package | Version | Compatible engine | Build host | Target |
-| --- | --- | --- | --- | --- |
-| `infernux/platform-windows` | 0.2.21 | Infernux >=0.4.3; payload 0.4.3-v8; Python 3.13 | Windows x64 | Windows x64 |
+The distribution service stores each engine's platform packages under `platform-plugins/<engine_release>/`. The corresponding engine GitHub Release provides the same packages as a download alternative. The plugin repositories no longer independently publish platform binaries.
 
-## Install and use
+A matching precompiled Player is used directly. If an installed Player is incompatible, the engine export worker attempts a source rebuild for the current engine release, validates it, and replaces the installed plugin's Player payload. This repair requires the corresponding source toolchain. Successful repairs are reused; the engine SDK is not replaced.
 
-Open **Plugins** in Infernux, select **Infernux Windows Platform** from the official catalog, then import and enable it. Official installs use the Infernux distribution service first and GitHub Releases if that channel is unavailable. You can also download `infernux.platform-windows.inxpkg` from this repository's Releases page and import it manually.
+## Maintain
 
-Open the build settings, choose `windows-x64`, and export. The result contains the executable, runtime libraries, and packaged game data; distribute the complete output directory together. Users do not need an engine checkout, CMake, or a compiler toolchain.
+From the engine repository, use `scripts/release/build_platform_plugins.py` to build or package this target. The engine's `engine-platform-plugins.yml` workflow collects all four platforms from the same engine commit, checks their identities and digests, and gates publication of the engine release. `package.py` and `release.py` remain available for standalone development checks, not independent platform distribution.
 
-This is a native-host exporter: Windows builds Windows. Installing it on Linux does not add Windows cross-compilation.
-
-## Repository guide
-
-The installable plugin lives in `package/`. `package.py`, `release.py`, tests, CI, documentation sources, and native build configuration are maintainer tooling and are not included in the `.inxpkg`.
-
-```text
-package/
-  inx_package.json
-  editor/infernux_windows/
-  plugin_pages/
-```
-
-Maintainers build the engine's `windows-msvc-player` preset, which writes the Player directly into this repository. To validate an existing payload locally:
-
-```powershell
-python package.py dist/infernux.platform-windows.inxpkg
-python release.py v0.2.1
-```
-
-Pushing a matching `v<version>` tag makes GitHub Actions build and publish the `.inxpkg` and its release manifest.
+Only `package/` and the compiled target payload enter the installable archive. Tests, CMake, CI, source build tools and caches remain outside it. See the engine documentation [Platform Player releases](https://github.com/ChenlizheMe/Infernux/blob/main/docs/learn/platform-player-releases.md) for toolchain variables and batch commands.
 
 ## License
 
-[MIT](LICENSE). Bundled third-party components retain their own licenses.
+[MIT](LICENSE). Bundled dependencies retain their own licenses.
