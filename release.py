@@ -41,7 +41,7 @@ def build_release(tag: str | None = None, output: Path | None = None) -> tuple[P
         tag = expected
     if tag != expected:
         raise ValueError(f"Release tag must match package version: {expected}")
-    payload, _ = player_payload(metadata["engine"].removeprefix(">="))
+    payload, _ = player_payload(metadata["engine"].removeprefix("=="))
     engine_release = json.loads((payload / "Player.inxmanifest").read_text(encoding="utf-8"))["engine_release"]
     destination = output if output is not None else root / "dist"
     destination.mkdir(parents=True, exist_ok=True)
